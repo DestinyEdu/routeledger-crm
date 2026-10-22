@@ -1,4 +1,6 @@
 import uuid
+from datetime import timezone
+from zoneinfo import ZoneInfo
 from decimal import Decimal, InvalidOperation
 
 from flask import Flask, redirect, render_template, request, url_for
@@ -23,6 +25,13 @@ def create_app():
     db.init_app(app)
     with app.app_context():
         db.create_all()
+
+    @app.template_filter("local_time")
+    def local_time(value):
+        if value.tzinfo is None:
+            value = value.replace(tzinfo=timezone.utc)
+        local = value.astimezone(ZoneInfo("Africa/Johannesburg"))
+        return local.strftime("%Y-%m-%d %H:%M")
 
     def count_status(status):
         return Transaction.query.filter_by(status=status.value).count()
