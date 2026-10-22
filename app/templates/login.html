@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sign in - RouteLedger</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <main class="login-wrap">
+        <section class="panel">
+            <h2>Sign in to RouteLedger</h2>
+            {% if error %}<p class="notice">{{ error }}</p>{% endif %}
+            <form method="post" class="tx-form">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="next" value="{{ next_url }}">
+                <label>Username
+                    <input type="text" name="username" required autofocus autocomplete="username">
+                </label>
+                <label>Password
+                    <input type="password" name="password" required autocomplete="current-password">
+                </label>
+                <button type="submit">Sign in</button>
+            </form>
+        </section>
+    </main>
+</body>
+</html>

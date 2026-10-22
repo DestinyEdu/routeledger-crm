@@ -17,6 +17,7 @@
     </header>
 
     <main class="container">
+<div class="userbar"><span>Signed in as {{ current_user.username }}</span><form method="post" action="{{ url_for('logout') }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button type="submit" class="small">Log out</button></form></div>
         <section class="welcome">
             <h2>Operations Dashboard</h2>
             <p>Monitor incoming funds and track payout progress.</p>
@@ -52,6 +53,7 @@
             <h2>New Transaction</h2>
             {% if error %}<p class="notice">{{ error }}</p>{% endif %}
             <form method="post" action="{{ url_for('create_transaction') }}" class="tx-form">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <label>Sender name
                     <input type="text" name="sender_name" required maxlength="120" value="{{ form.sender_name }}">
                 </label>
@@ -88,6 +90,7 @@
                             <td>
                                 {% if t.status != "completed" %}
                                 <form method="post" action="{{ url_for('advance_transaction', transaction_id=t.id) }}">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                     <button type="submit" class="small">Advance</button>
                                 </form>
                                 {% endif %}

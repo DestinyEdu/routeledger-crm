@@ -117,3 +117,8 @@ button.small { padding: 6px 12px; font-size: 0.85rem; }
 .tx-table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
 .tx-table th, .tx-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid #e2e8f0; white-space: nowrap; }
 .tx-table th { font-size: 0.8rem; text-transform: uppercase; color: #64748b; }
+
+/* Login and signed-in bar */
+.login-wrap { max-width: 420px; margin: 80px auto; padding: 0 16px; }
+.login-wrap .tx-form { flex-direction: column; align-items: stretch; }
+.userbar { display: flex; justify-content: flex-end; align-items: center; gap: 12px; padding: 12px 0; font-size: 0.9rem; color: #475569; }
