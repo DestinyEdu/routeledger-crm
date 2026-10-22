@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RouteLedger CRM</title>
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header class="header">
+        <div>
+            <h1>RouteLedger</h1>
+            <p>Transaction Management CRM</p>
+        </div>
+        <span class="status">Development Mode</span>
+    </header>
+
+    <main class="container">
+        <section class="welcome">
+            <h2>Operations Dashboard</h2>
+            <p>Monitor incoming funds and track payout progress.</p>
+        </section>
+
+        <section class="metrics">
+            <article class="card">
+                <h3>Funds Received</h3>
+                <p class="value">R 0.00</p>
+                <small>Awaiting verified transactions</small>
+            </article>
+
+            <article class="card">
+                <h3>Pending Verification</h3>
+                <p class="value">0</p>
+                <small>Transactions requiring review</small>
+            </article>
+
+            <article class="card">
+                <h3>Awaiting Payout</h3>
+                <p class="value">0</p>
+                <small>Verified transactions only</small>
+            </article>
+
+            <article class="card">
+                <h3>Completed Payouts</h3>
+                <p class="value">0</p>
+                <small>Recorded as completed</small>
+            </article>
+        </section>
+
+        <section class="panel">
+            <h2>Transaction Register</h2>
+            <p>Your transaction records will appear here in a later stage.</p>
+            <p class="notice">
+                Demonstration dashboard only. No real bank or payment
+                transactions are connected.
+            </p>
+        </section>
+    </main>
+</body>
+</html>
