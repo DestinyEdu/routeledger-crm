@@ -106,3 +106,14 @@ body {
         grid-template-columns: 1fr;
     }
 }
+
+/* Transaction form and table */
+.tx-form { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; }
+.tx-form label { display: flex; flex-direction: column; gap: 6px; font-weight: 600; font-size: 0.9rem; }
+.tx-form input { padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 1rem; }
+.tx-form button, button.small { background: #0f2540; color: #fff; border: 0; border-radius: 6px; padding: 10px 16px; font-weight: 600; cursor: pointer; }
+button.small { padding: 6px 12px; font-size: 0.85rem; }
+.table-wrap { overflow-x: auto; }
+.tx-table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
+.tx-table th, .tx-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid #e2e8f0; white-space: nowrap; }
+.tx-table th { font-size: 0.8rem; text-transform: uppercase; color: #64748b; }

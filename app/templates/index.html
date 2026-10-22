@@ -25,37 +25,87 @@
         <section class="metrics">
             <article class="card">
                 <h3>Funds Received</h3>
-                <p class="value">R 0.00</p>
+                <p class="value">R {{ "{:,.2f}".format(funds_received) }}</p>
                 <small>Awaiting verified transactions</small>
             </article>
 
             <article class="card">
                 <h3>Pending Verification</h3>
-                <p class="value">0</p>
+                <p class="value">{{ pending_count }}</p>
                 <small>Transactions requiring review</small>
             </article>
 
             <article class="card">
                 <h3>Awaiting Payout</h3>
-                <p class="value">0</p>
+                <p class="value">{{ awaiting_count }}</p>
                 <small>Verified transactions only</small>
             </article>
 
             <article class="card">
                 <h3>Completed Payouts</h3>
-                <p class="value">0</p>
+                <p class="value">{{ completed_count }}</p>
                 <small>Recorded as completed</small>
             </article>
         </section>
 
         <section class="panel">
+            <h2>New Transaction</h2>
+            {% if error %}<p class="notice">{{ error }}</p>{% endif %}
+            <form method="post" action="{{ url_for('create_transaction') }}" class="tx-form">
+                <label>Sender name
+                    <input type="text" name="sender_name" required maxlength="120" value="{{ form.sender_name }}">
+                </label>
+                <label>Recipient name
+                    <input type="text" name="recipient_name" required maxlength="120" value="{{ form.recipient_name }}">
+                </label>
+                <label>Amount (ZAR)
+                    <input type="number" name="amount" required min="0.01" step="0.01" value="{{ form.amount }}">
+                </label>
+                <button type="submit">Add transaction</button>
+            </form>
+        </section>
+
+        <section class="panel">
             <h2>Transaction Register</h2>
-            <p>Your transaction records will appear here in a later stage.</p>
+            {% if transactions %}
+            <div class="table-wrap">
+                <table class="tx-table">
+                    <thead>
+                        <tr>
+                            <th>Reference</th><th>Sender</th><th>Recipient</th>
+                            <th>Amount</th><th>Status</th><th>Created</th><th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for t in transactions %}
+                        <tr>
+                            <td>{{ t.reference }}</td>
+                            <td>{{ t.sender_name }}</td>
+                            <td>{{ t.recipient_name }}</td>
+                            <td>{{ t.currency }} {{ "{:,.2f}".format(t.amount) }}</td>
+                            <td>{{ t.status.replace("_", " ").title() }}</td>
+                            <td>{{ t.created_at.strftime("%Y-%m-%d %H:%M") }}</td>
+                            <td>
+                                {% if t.status != "completed" %}
+                                <form method="post" action="{{ url_for('advance_transaction', transaction_id=t.id) }}">
+                                    <button type="submit" class="small">Advance</button>
+                                </form>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p>No transactions yet. Add one above.</p>
+            {% endif %}
             <p class="notice">
                 Demonstration dashboard only. No real bank or payment
                 transactions are connected.
             </p>
         </section>
-    </main>
+    
+</main>
 </body>
 </html>
