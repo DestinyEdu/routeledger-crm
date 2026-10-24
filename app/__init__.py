@@ -66,14 +66,19 @@ def safe_next(target):
     return url_for("dashboard")
 
 
-def create_app():
+def create_app(test_config=None):
     app = Flask(__name__)
-    app.config["SECRET_KEY"] = load_secret_key(app)
+    if test_config and test_config.get("SECRET_KEY"):
+        app.config["SECRET_KEY"] = test_config["SECRET_KEY"]
+    else:
+        app.config["SECRET_KEY"] = load_secret_key(app)
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///routeledger.db"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     app.config["SESSION_COOKIE_HTTPONLY"] = True
     app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
     app.config["WTF_CSRF_TIME_LIMIT"] = None  # token lasts for the session
+    if test_config:
+        app.config.update(test_config)
 
     db.init_app(app)
     csrf.init_app(app)

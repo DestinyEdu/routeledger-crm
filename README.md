@@ -32,7 +32,7 @@ routeledger-crm/
 │   ├── models.py          # User, Transaction, TransactionStatus
 │   ├── static/            # style.css, app.js
 │   └── templates/         # index.html (dashboard), login.html
-├── tests/                 # test suite (not written yet)
+├── tests/                 # pytest test suite
 ├── requirements.txt
 └── run.py                 # entry point
 ```
@@ -61,6 +61,15 @@ python run.py
 
 Then open <http://127.0.0.1:5000> and sign in.
 
+## Running the tests
+
+```bash
+pip install -r requirements-dev.txt
+pytest
+```
+
+Tests use an in-memory database, so your real data is never touched.
+
 ## Configuration
 
 | Setting | How it works |
@@ -86,13 +95,12 @@ Not implemented yet:
 - Login rate limiting or lockout
 - HTTPS and secure cookies (required before any real deployment)
 - Audit trail of who created or changed each transaction
-- Automated tests
 
 Do not run with `debug=True` on any machine other people can reach.
 
 ## Roadmap
 
-- [ ] Automated tests (pytest) for the status flow, dashboard totals, validation, and access control
+- [x] Automated tests (pytest) for the status flow, dashboard totals, validation, and access control
 - [ ] Audit log of transaction changes
 - [ ] Login rate limiting
 - [ ] Transaction search and filtering
