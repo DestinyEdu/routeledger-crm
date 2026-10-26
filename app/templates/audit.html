@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Audit log - RouteLedger</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <main class="page-wrap">
+        <div class="userbar">
+            <a href="{{ url_for('dashboard') }}">&larr; Back to dashboard</a>
+        </div>
+        <section class="panel">
+            <h2>Audit Log</h2>
+            <p>The 200 most recent events. Entries are append-only.</p>
+            {% if entries %}
+            <div class="table-wrap">
+                <table class="tx-table">
+                    <thead>
+                        <tr>
+                            <th>When</th><th>User</th><th>Action</th>
+                            <th>Transaction</th><th>Detail</th><th>IP</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for e in entries %}
+                        <tr>
+                            <td>{{ e.created_at|local_time }}</td>
+                            <td>{{ e.username or "-" }}</td>
+                            <td>{{ e.action }}</td>
+                            <td>{{ e.transaction_reference or "-" }}</td>
+                            <td>{{ e.detail or "" }}</td>
+                            <td>{{ e.ip_address or "-" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p>No events yet.</p>
+            {% endif %}
+        </section>
+    </main>
+</body>
+</html>

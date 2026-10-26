@@ -18,7 +18,7 @@ from flask_wtf.csrf import CSRFProtect
 from sqlalchemy import func
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from app.models import Transaction, TransactionStatus, User, db
+from app.models import AuditLog, Transaction, TransactionStatus, User, db
 
 STATUS_FLOW = [s.value for s in TransactionStatus]
 FUNDED_STATUSES = [
@@ -64,6 +64,22 @@ def safe_next(target):
     ):
         return target
     return url_for("dashboard")
+
+
+def record_audit(action, detail="", transaction=None, username=None):
+    """Queue an audit entry; it is saved by the caller's db.session.commit()."""
+    signed_in = current_user.is_authenticated
+    db.session.add(
+        AuditLog(
+            action=action,
+            detail=(detail or "")[:255],
+            user_id=current_user.id if signed_in else None,
+            username=username or (current_user.username if signed_in else None),
+            transaction_id=transaction.id if transaction else None,
+            transaction_reference=transaction.reference if transaction else None,
+            ip_address=request.remote_addr,
+        )
+    )
 
 
 def create_app(test_config=None):
@@ -147,7 +163,15 @@ def create_app(test_config=None):
             if valid:
                 session.clear()  # fresh session on login
                 login_user(user)
+                record_audit("auth.login")
+                db.session.commit()
                 return redirect(safe_next(next_url))
+            record_audit(
+                "auth.login_failed",
+                "unknown user" if user is None else "bad password",
+                username=username[:64],
+            )
+            db.session.commit()
             return (
                 render_template(
                     "login.html",
@@ -161,6 +185,8 @@ def create_app(test_config=None):
     @app.route("/logout", methods=["POST"])
     @login_required
     def logout():
+        record_audit("auth.logout")
+        db.session.commit()
         logout_user()
         return redirect(url_for("login"))
 
@@ -199,6 +225,12 @@ def create_app(test_config=None):
             amount=amount.quantize(Decimal("0.01")),
         )
         db.session.add(tx)
+        db.session.flush()  # assigns tx.id for the audit entry
+        record_audit(
+            "transaction.created",
+            f"{tx.currency} {tx.amount:,.2f} from {sender} to {recipient}",
+            transaction=tx,
+        )
         db.session.commit()
         return redirect(url_for("dashboard"))
 
@@ -208,9 +240,25 @@ def create_app(test_config=None):
         tx = db.get_or_404(Transaction, transaction_id)
         position = STATUS_FLOW.index(tx.status)
         if position < len(STATUS_FLOW) - 1:
+            old_status = tx.status
             tx.status = STATUS_FLOW[position + 1]
+            record_audit(
+                "transaction.advanced",
+                f"{old_status} -> {tx.status}",
+                transaction=tx,
+            )
             db.session.commit()
         return redirect(url_for("dashboard"))
+
+    @app.route("/audit")
+    @login_required
+    def audit():
+        entries = (
+            AuditLog.query.order_by(AuditLog.created_at.desc(), AuditLog.id.desc())
+            .limit(200)
+            .all()
+        )
+        return render_template("audit.html", entries=entries)
 
     @app.cli.command("create-user")
     @click.argument("username")
