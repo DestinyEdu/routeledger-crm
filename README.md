@@ -13,6 +13,7 @@ A transaction-management dashboard built with Flask. It tracks incoming funds an
 - **Auto-generated references** in the form `RL-XXXXXXXX`
 - **Authentication**: login and logout with hashed passwords, and every dashboard and transaction route requires a signed-in user
 - **CSRF protection** on all forms
+- **Audit log**: append-only record of logins, logouts, and every transaction created or advanced, viewable at `/audit`
 - No public sign-up: users are created from the command line
 
 ## Tech stack
@@ -94,14 +95,13 @@ Not implemented yet:
 
 - Login rate limiting or lockout
 - HTTPS and secure cookies (required before any real deployment)
-- Audit trail of who created or changed each transaction
 
 Do not run with `debug=True` on any machine other people can reach.
 
 ## Roadmap
 
 - [x] Automated tests (pytest) for the status flow, dashboard totals, validation, and access control
-- [ ] Audit log of transaction changes
+- [x] Audit log of transaction changes
 - [ ] Login rate limiting
 - [ ] Transaction search and filtering
 - [ ] Deployment configuration with HTTPS
