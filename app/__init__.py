@@ -1,3 +1,4 @@
+import math
 import os
 import secrets
 import uuid
@@ -6,7 +7,15 @@ from decimal import Decimal, InvalidOperation
 from zoneinfo import ZoneInfo
 
 import click
-from flask import Flask, redirect, render_template, request, session, url_for
+from flask import (
+    Flask,
+    make_response,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+)
 from flask_login import (
     LoginManager,
     current_user,
@@ -19,6 +28,7 @@ from sqlalchemy import func
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from app.models import AuditLog, Transaction, TransactionStatus, User, db
+from app.security import already_logged_block, login_lockout_seconds
 
 STATUS_FLOW = [s.value for s in TransactionStatus]
 FUNDED_STATUSES = [
@@ -153,6 +163,31 @@ def create_app(test_config=None):
         if request.method == "POST":
             username = request.form.get("username", "").strip().lower()
             password = request.form.get("password", "")
+
+            lockout = login_lockout_seconds(request.remote_addr, username)
+            if lockout:
+                if not already_logged_block(request.remote_addr, username):
+                    record_audit(
+                        "auth.login_blocked",
+                        f"too many failed attempts; locked for up to {lockout}s",
+                        username=username[:64],
+                    )
+                    db.session.commit()
+                minutes = max(1, math.ceil(lockout / 60))
+                resp = make_response(
+                    render_template(
+                        "login.html",
+                        error=(
+                            "Too many failed sign-in attempts. "
+                            f"Try again in about {minutes} minute(s)."
+                        ),
+                        next_url=next_url,
+                    ),
+                    429,
+                )
+                resp.headers["Retry-After"] = str(lockout)
+                return resp
+
             user = User.query.filter_by(username=username).first()
             if user:
                 valid = user.check_password(password)

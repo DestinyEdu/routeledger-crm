@@ -89,11 +89,11 @@ Implemented:
 - Session cookies are HttpOnly and SameSite=Lax, with the session reset on login
 - Login redirects only to paths on the same site
 - Login errors don't reveal whether a username exists
+- Login throttling: 5 failed attempts per IP and username, or 20 per IP, within 15 minutes triggers a temporary lockout
 - Basic security headers on all responses
 
 Not implemented yet:
 
-- Login rate limiting or lockout
 - HTTPS and secure cookies (required before any real deployment)
 
 Do not run with `debug=True` on any machine other people can reach.
@@ -102,7 +102,7 @@ Do not run with `debug=True` on any machine other people can reach.
 
 - [x] Automated tests (pytest) for the status flow, dashboard totals, validation, and access control
 - [x] Audit log of transaction changes
-- [ ] Login rate limiting
+- [x] Login rate limiting
 - [ ] Transaction search and filtering
 - [ ] Deployment configuration with HTTPS
 
